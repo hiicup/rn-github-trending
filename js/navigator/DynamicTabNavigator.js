@@ -102,7 +102,11 @@ class TabBarComponent extends Component{
         const {routes,index} = this.props.navigation.state;
 
         if(routes[index].params){
-            this.theme = routes[index].params.theme;
+
+            const {theme} = routes[index].params;
+            if(theme && theme.updateTime > this.theme.updateTime){
+                this.theme = routes[index].params.theme;
+            }
         }
 
         return <BottomTabBar
