@@ -5,6 +5,7 @@ import {
 import WelcomePage from "../page/WelcomePage";
 import HomePage from "../page/HomePage";
 import DetailPage from "../page/DetailPage";
+import StoreDemoPage from "../page/StoreDemoPage";
 
 import {connect} from "react-redux";
 import {
@@ -29,6 +30,12 @@ const MainNavigator = createStackNavigator({
     },
     DetailPage:{
         screen:DetailPage,
+        navigationOptions:{
+            // header:
+        }
+    },
+    StoreDemoPage:{
+        screen:StoreDemoPage,
         navigationOptions:{
             // header:
         }
