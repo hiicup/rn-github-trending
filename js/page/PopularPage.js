@@ -16,6 +16,9 @@ import actions from "../action/index"
 
 import PopularItem from "../common/PopularItem"
 
+import NavigationBar from "../common/NavigationBar"
+import Store, {FLAG_TYPE} from "../expend/dao/DataStore";
+
 
 const URL = "https://api.github.com/search/repositories?q=";
 const QUERY_STRING = '&sort=stars';
@@ -26,7 +29,8 @@ export default class PopularPage extends Component<Props> {
 
     constructor(props) {
         super(props);
-        this.tabNames = ['Java', 'Python', 'Golang']
+        // this.tabNames = ['Java', 'Python', 'Golang',"Javascript","Rust","Ruby"]
+        this.tabNames = ['Java']
     }
 
     _genTabs() {
@@ -59,7 +63,12 @@ export default class PopularPage extends Component<Props> {
         });
 
         return (
-            <TabNavigator/>
+            <View style={{flex:1}}>
+                <NavigationBar
+                    title="最热"
+                />
+                <TabNavigator/>
+            </View>
         );
     }
 }
@@ -186,7 +195,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5',
     },
     tabStyle: {
-        minWidth: 50,
+        width: 120,
     },
     indicatorStyle: {
         backgroundColor: 'white'
