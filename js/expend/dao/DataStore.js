@@ -132,8 +132,8 @@ export default class DataStore {
         if (nowDate.getMonth() !== targetDate.getMonth()) return false;
         if (nowDate.getDate() !== targetDate.getDate()) return false;
 
-        // return nowDate.getHours() - targetDate.getHours() > 4;
-        return nowDate.getMinutes() - targetDate.getMinutes() < 1
+        return nowDate.getHours() - targetDate.getHours() < 4;
+        // return nowDate.getMinutes() - targetDate.getMinutes() < 1
     }
 
     _wrapData(data) {

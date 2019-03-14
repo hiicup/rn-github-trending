@@ -1,15 +1,11 @@
 import React, {Component} from 'react';
 import {
-    StyleSheet,
-    View,
-    Text,
-    FlatList,
-    RefreshControl,
-    ActivityIndicator,
-    ToastAndroid,
-    StatusBar
+    StyleSheet, View, Text, FlatList, RefreshControl,ActivityIndicator,
+    ToastAndroid, StatusBar, TouchableOpacity, DeviceEventEmitter
 } from 'react-native';
 import {createMaterialTopTabNavigator} from "react-navigation";
+
+import Ionicons from "react-native-vector-icons/Ionicons"
 
 import {connect} from "react-redux"
 import actions from "../action/index"
@@ -17,19 +13,23 @@ import actions from "../action/index"
 import TrendingItem from "../common/TrendingItem"
 
 import NavigationBar from "../common/NavigationBar"
-import Store, {FLAG_TYPE} from "../expend/dao/DataStore";
-
+import TrendingDialog,{items as TrendingItems} from "../common/TrendingDialog"
 
 const URL = "https://github.com/trending/";
-const QUERY_STRING = '?since=daily';
 
+const ALL_Text = 'All';
+
+const EVENT_SINCE_CHANGE = 'EVENT_SINCE_CHANGE';
 
 type Props = {};
 export default class TrendingPage extends Component<Props> {
 
     constructor(props) {
         super(props);
-        this.tabNames = ['All Language',"Java",'Python']
+        this.tabNames = [ALL_Text,"Java",'Python']
+        this.state = {
+            tabItem:TrendingItems[0]
+        };
     }
 
     _genTabs() {
@@ -37,7 +37,7 @@ export default class TrendingPage extends Component<Props> {
 
         this.tabNames.forEach((item, index) => {
             tabs[`Tab${index}`] = {
-                screen: (props) => <TrendingTabPage {...props} name={item}/>,
+                screen: (props) => <TrendingTabPage {...props} tabItem={this.state.tabItem} name={item}/>,
                 navigationOptions: {
                     title: item
                 }
@@ -47,26 +47,49 @@ export default class TrendingPage extends Component<Props> {
         return tabs;
     }
 
-    render() {
-        const TabNavigator = createMaterialTopTabNavigator(this._genTabs(), {
-            tabBarOptions: {
-                upperCaseLabel: false, // 禁止自动大写
-                scrollEnabled: true, // 启用横向滚动
-                style: {
-                    backgroundColor: '#678' // 设置整个tabBar的底色
-                },
-                tabStyle: styles.tabStyle,                  // 设置每一个tab样式，比如宽度
-                indicatorStyle: styles.indicatorStyle,    // 底部游标的样式
-                labelStyle: styles.labelStyle                // 文字样式
-            }
+    onClickSince(item){
+        this.dialog.close();
+        this.setState({
+            tabItem:item
         });
+        DeviceEventEmitter.emit(EVENT_SINCE_CHANGE,item);
+    }
 
+    renderTitleView(){
+        return <TouchableOpacity onPress={()=>this.dialog.show()} style={{flexDirection:'row', justifyContent:"center"}}>
+            <Text style={styles.title}>最热</Text>
+            <Text style={styles.title}>{this.state.tabItem.text}</Text>
+            <Ionicons name={"md-arrow-dropdown"} size={26} style={{color:"white"}}/>
+        </TouchableOpacity>
+    }
+
+    genNav(){
+        if(!this.tabNav){
+            this.tabNav = createMaterialTopTabNavigator(this._genTabs(), {
+                tabBarOptions: {
+                    upperCaseLabel: false, // 禁止自动大写
+                    scrollEnabled: true, // 启用横向滚动
+                    style: {
+                        backgroundColor: '#678' // 设置整个tabBar的底色
+                    },
+                    tabStyle: styles.tabStyle,                  // 设置每一个tab样式，比如宽度
+                    indicatorStyle: styles.indicatorStyle,    // 底部游标的样式
+                    labelStyle: styles.labelStyle                // 文字样式
+                }
+            });
+        }
+        return this.tabNav;
+    }
+
+    render() {
+        const TabNav = this.genNav();
         return (
             <View style={{flex:1}}>
                 <NavigationBar
-                    title="最热"
+                    titleView={this.renderTitleView()}
                 />
-                <TabNavigator/>
+                <TabNav/>
+                <TrendingDialog ref={dialog=>{this.dialog = dialog}} onClick={item=>this.onClickSince(item)} onClose={()=>{}}/>
             </View>
         );
     }
@@ -78,19 +101,31 @@ class TabPage extends Component {
 
     constructor(props) {
         super(props);
-        const {name} = this.props;
+        const {name,tabItem} = this.props;
         this.storeName = name;
+        this.tabItem = tabItem;
     }
 
     componentDidMount() {
         this.loadData();
+        this.sinceChangeEventListener = DeviceEventEmitter.addListener(EVENT_SINCE_CHANGE,item=>{
+            this.tabItem = item;
+            this.loadData();
+        });
+    }
+
+    componentWillUnmount() {
+        if(this.sinceChangeEventListener){
+            this.sinceChangeEventListener.remove();
+        }
     }
 
 
     loadData(isLoadMore) {
         const {onLoadTrendingData, onLoadTrendingMoreData} = this.props;
         let store = this.getStore();
-        const url = TabPage.buildFetchUrl(this.storeName);
+        const url = this.buildFetchUrl(this.storeName);
+        console.log("请求地址：",url);
         if (isLoadMore) {
             onLoadTrendingMoreData(this.storeName, ++store.pageIndex, PAGE_SIZE, store.items, (error) => {
                 ToastAndroid.showWithGravity('没有更多数据',ToastAndroid.SHORT,ToastAndroid.CENTER);
@@ -100,13 +135,13 @@ class TabPage extends Component {
         }
     }
 
-    static buildFetchUrl(key) {
+    buildFetchUrl(key) {
 
-        if(key === 'All Language'){
+        if(key === ALL_Text){
             key = '';
         }
 
-        return URL + key + QUERY_STRING;
+        return URL + key + '?since='+this.tabItem.since;
     }
 
     renderItem(item) {
@@ -206,5 +241,9 @@ const styles = StyleSheet.create({
     },
     labelStyle: {
         fontSize: 13
-    }
+    },
+    title: {
+        fontSize:16,
+        color:'white'
+    },
 });
