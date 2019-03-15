@@ -31,13 +31,7 @@ const MainNavigator = createStackNavigator({
     DetailPage:{
         screen:DetailPage,
         navigationOptions:{
-            // header:
-        }
-    },
-    StoreDemoPage:{
-        screen:StoreDemoPage,
-        navigationOptions:{
-            // header:
+            header:null
         }
     }
 });

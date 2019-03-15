@@ -18,6 +18,7 @@ import PopularItem from "../common/PopularItem"
 
 import NavigationBar from "../common/NavigationBar"
 import Store, {FLAG_TYPE} from "../expend/dao/DataStore";
+import NavigationUtil from "../navigator/NavigationUtil";
 
 
 const URL = "https://api.github.com/search/repositories?q=";
@@ -106,8 +107,11 @@ class PopularTab extends Component {
     }
 
     renderItem(item) {
-        return <PopularItem item={item.item} onSelect={() => {
-            console.log('xxx')
+        return <PopularItem item={item.item} onSelect={item => {
+            NavigationUtil.gotoPage({
+                navigation:NavigationUtil.navigation,
+                item
+            },"DetailPage")
         }}/>
     }
 

@@ -7,7 +7,7 @@ export default class PopularItem extends Component {
     render() {
         const {item} = this.props;
 
-        return <TouchableOpacity onPress={this.props.onSelect}>
+        return <TouchableOpacity onPress={()=>this.props.onSelect(item)}>
             <View style={styles.container}>
                 <Text style={{fontSize:16,color:'#212121',marginBottom:5}}>{item.full_name}</Text>
                 <Text style={{fontSize:14,color:'#757575',marginBottom:5}}>{item.description}</Text>

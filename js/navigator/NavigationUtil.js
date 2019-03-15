@@ -15,7 +15,7 @@ export default class NavigationUtil {
         const {navigation} = params;
 
         if(!navigation){
-            console.log("navigation can not be null.");
+            alert("navigation can not be null.");
             return;
         }
 

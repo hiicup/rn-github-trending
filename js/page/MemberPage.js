@@ -7,6 +7,7 @@ import {connect} from "react-redux"
 
 type Props = {};
 class MemberPage extends Component<Props> {
+
     render() {
         return (
             <View style={styles.container}>

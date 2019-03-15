@@ -13,6 +13,7 @@ import MemberPage from "./../page/MemberPage";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Entypo from "react-native-vector-icons/Entypo";
+import AntDesign from "react-native-vector-icons/AntDesign";
 
 import {BottomTabBar} from "react-navigation-tabs";
 
@@ -49,8 +50,8 @@ const TABS = {
         navigationOptions:{
             tabBarLabel:"收藏",
             tabBarIcon:({tintColor,focused})=>{
-                return <MaterialIcons
-                    name={"favorite"}
+                return <AntDesign
+                    name={"staro"}
                     size={26}
                     style={{color:tintColor}}
                 />

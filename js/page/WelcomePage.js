@@ -13,7 +13,7 @@ export default class WelcomePage extends Component<Props> {
     componentDidMount() {
         this.timer = setTimeout(()=>{
             NavigationUtil.resetHomePage(this.props)
-        },100)
+        },3000)
     }
 
     componentWillUnmount() {
@@ -24,7 +24,7 @@ export default class WelcomePage extends Component<Props> {
     render() {
         return (
             <View style={styles.container}>
-                <Text>wellcome GithubTreading</Text>
+                <Text style={{fontSize:20}}>RN学习练手项目</Text>
             </View>
         );
     }

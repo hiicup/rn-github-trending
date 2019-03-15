@@ -23,7 +23,7 @@ export default class TrendingItem extends Component {
 
         const description = `<p>${item.description}</p>`;
 
-        return <TouchableOpacity onPress={this.props.onSelect}>
+        return <TouchableOpacity onPress={()=>this.props.onSelect(item)}>
             <View style={styles.container}>
                 <Text style={{fontSize:16,color:'#212121',marginBottom:5}}>{item.fullName}</Text>
                 <HtmlView onLinkPress={(url)=>{

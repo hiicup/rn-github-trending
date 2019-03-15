@@ -14,6 +14,7 @@ import TrendingItem from "../common/TrendingItem"
 
 import NavigationBar from "../common/NavigationBar"
 import TrendingDialog,{items as TrendingItems} from "../common/TrendingDialog"
+import NavigationUtil from "../navigator/NavigationUtil";
 
 const URL = "https://github.com/trending/";
 
@@ -145,8 +146,11 @@ class TabPage extends Component {
     }
 
     renderItem(item) {
-        return <TrendingItem item={item.item} onSelect={() => {
-            console.log('xxx')
+        return <TrendingItem item={item.item} onSelect={(item) => {
+            NavigationUtil.gotoPage({
+                navigation:NavigationUtil.navigation,
+                item
+            },"DetailPage")
         }}/>
     }
 
