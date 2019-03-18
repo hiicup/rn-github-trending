@@ -15,6 +15,8 @@ import TrendingItem from "../common/TrendingItem"
 import NavigationBar from "../common/NavigationBar"
 import TrendingDialog,{items as TrendingItems} from "../common/TrendingDialog"
 import NavigationUtil from "../navigator/NavigationUtil";
+import FavDao from "../expend/dao/FavDao";
+import {FLAG_TYPE} from "../expend/dao/DataStore";
 
 const URL = "https://github.com/trending/";
 
@@ -22,12 +24,14 @@ const ALL_Text = 'All';
 
 const EVENT_SINCE_CHANGE = 'EVENT_SINCE_CHANGE';
 
+const favDao = new FavDao(FLAG_TYPE.TRENDING);
+
 type Props = {};
 export default class TrendingPage extends Component<Props> {
 
     constructor(props) {
         super(props);
-        this.tabNames = [ALL_Text,"Java",'Python']
+        this.tabNames = [ALL_Text,"Java",'Python'];
         this.state = {
             tabItem:TrendingItems[0]
         };
@@ -130,9 +134,9 @@ class TabPage extends Component {
         if (isLoadMore) {
             onLoadTrendingMoreData(this.storeName, ++store.pageIndex, PAGE_SIZE, store.items, (error) => {
                 ToastAndroid.showWithGravity('没有更多数据',ToastAndroid.SHORT,ToastAndroid.CENTER);
-            })
+            },favDao)
         } else {
-            onLoadTrendingData(this.storeName, url,PAGE_SIZE);
+            onLoadTrendingData(this.storeName, url,PAGE_SIZE,favDao);
         }
     }
 
@@ -145,13 +149,22 @@ class TabPage extends Component {
         return URL + key + '?since='+this.tabItem.since;
     }
 
-    renderItem(item) {
-        return <TrendingItem item={item.item} onSelect={(item) => {
-            NavigationUtil.gotoPage({
-                navigation:NavigationUtil.navigation,
-                item
-            },"DetailPage")
-        }}/>
+    renderItem(data) {
+        const item = data.item;
+        return <TrendingItem
+            itemData={item}
+            onFav={(item,isFav)=>{
+                FavDao.onFav(favDao,item,isFav);
+            }}
+            onSelect={(itemData,callback) => {
+                NavigationUtil.gotoPage({
+                    navigation:NavigationUtil.navigation,
+                    itemData:itemData,
+                    favDao:favDao,
+                    flag:FLAG_TYPE.TRENDING,
+                    callback
+                },"DetailPage")
+            }}/>
     }
 
     getStore() {
@@ -188,7 +201,7 @@ class TabPage extends Component {
             <FlatList
                 data={store.projectModes}
                 renderItem={item => this.renderItem(item)}
-                keyExtractor={item => "" + item.fullName}
+                keyExtractor={item => "" + item.item.fullName}
                 refreshControl={
                     <RefreshControl
                         title={"加载中..."}
@@ -221,11 +234,11 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    onLoadTrendingData: (storeName, url,pageSize) => {
-        dispatch(actions.onLoadTrendingData(storeName, url,pageSize));
+    onLoadTrendingData: (storeName, url,pageSize,favDao) => {
+        dispatch(actions.onLoadTrendingData(storeName, url,pageSize,favDao));
     },
-    onLoadTrendingMoreData: (storeName, pageIndex, pageSize, items, callback) => {
-        dispatch(actions.onLoadTrendingMoreData(storeName, pageIndex, pageSize, items, callback));
+    onLoadTrendingMoreData: (storeName, pageIndex, pageSize, items, callback,favDao) => {
+        dispatch(actions.onLoadTrendingMoreData(storeName, pageIndex, pageSize, items, callback,favDao));
     }
 });
 

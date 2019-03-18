@@ -24,10 +24,10 @@ export default class ViewHelper {
         </TouchableOpacity>
     }
 
-    static favoriteView(callback){
+    static favoriteView(callback,isFav=false){
         return <TouchableOpacity onPress={callback}>
             <AntDesign
-                name={"staro"}
+                name={isFav?"star":"staro"}
                 size={24}
                 style={{color:'white'}}
             />

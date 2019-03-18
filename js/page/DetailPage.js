@@ -5,6 +5,7 @@ import {WebView} from "react-native-webview";
 import NavigationBar from "../common/NavigationBar"
 import ViewHelper from "../common/ViewHelper";
 import NavigationUtil from "../navigator/NavigationUtil";
+import FavDao from "../expend/dao/FavDao";
 
 const GITHUB_BASE_URL = 'https://github.com/';
 type Props = {};
@@ -13,15 +14,20 @@ export default class DetailPage extends Component<Props> {
     constructor(props) {
         super(props);
         this.params = this.props.navigation.state.params;
-        const {item} = this.params;
+        const {itemData,flag,favDao} = this.params;
+
+        const item = itemData.item;
+        this.itemData = itemData;
         this.item = item;
+        this.favDao = favDao;
         this.url = item.html_url || GITHUB_BASE_URL + item.fullName;
         const title = item.full_name || item.fullName;
 
         this.state = {
             url: this.url,
             title: title,
-            canGoBack: false
+            canGoBack: false,
+            isFav:this.itemData.isFav
         };
 
     }
@@ -55,11 +61,17 @@ export default class DetailPage extends Component<Props> {
     }
 
     onFav() {
-        alert('fav');
+        const {callback} = this.params;
+        const isFav = this.itemData.isFav = !this.itemData.isFav;
+        callback(isFav);
+        this.setState({
+            isFav:isFav
+        });
+        FavDao.onFav(this.favDao,this.item,isFav);
     }
 
     renderRightButton() {
-        const favoriteView = ViewHelper.favoriteView(this.onFav);
+        const favoriteView = ViewHelper.favoriteView(this.onFav.bind(this),this.state.isFav);
         const shareView = ViewHelper.shareView(this.onShare);
         return <View style={{flexDirection: 'row', paddingRight: 15}}>
             <View style={{paddingRight: 5}}>

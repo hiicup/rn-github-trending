@@ -6,8 +6,53 @@ import HtmlView from "react-native-htmlview"
 
 
 export default class TrendingItem extends Component {
+
+    constructor(props){
+        super(props);
+
+        this.state = {
+            isFav:props.itemData.isFav
+        }
+
+    }
+
+    /**
+     * 从属性来检测变化，更新到状态上
+     * @param nextProps
+     * @param prevState
+     * @returns {*}
+     */
+    static getDerivedStateFromProps(nextProps,prevState){
+        const isFav = nextProps.itemData.isFav;
+        if(isFav !== prevState.isFav){
+            return {
+                isFav:isFav
+            }
+        }
+        return null;
+    }
+
+    updateFavState(isFav){
+        this.props.itemData.isFav = isFav;
+        this.setState({
+            isFav:isFav
+        })
+    }
+
+    onFavPress(){
+        this.updateFavState(!this.state.isFav);
+        this.props.onFav(this.props.itemData.item,!this.state.isFav);
+    }
+
+    onSelect(itemData){
+        this.props.onSelect(itemData,(isFav)=>{
+            this.updateFavState(isFav);
+        });
+    }
+
     render() {
-        const {item} = this.props;
+        const {itemData} = this.props;
+        const item = itemData.item;
 
         let buildBy = [];
 
@@ -23,7 +68,7 @@ export default class TrendingItem extends Component {
 
         const description = `<p>${item.description}</p>`;
 
-        return <TouchableOpacity onPress={()=>this.props.onSelect(item)}>
+        return <TouchableOpacity onPress={()=>this.onSelect(itemData)}>
             <View style={styles.container}>
                 <Text style={{fontSize:16,color:'#212121',marginBottom:5}}>{item.fullName}</Text>
                 <HtmlView onLinkPress={(url)=>{
@@ -40,10 +85,12 @@ export default class TrendingItem extends Component {
                         <Text>{item.starCount}</Text>
                     </View>
                     <View>
-                        <AntDesign
-                            name={"staro"}
-                            size={20}
-                        />
+                        <TouchableOpacity onPress={(item)=>this.onFavPress()}>
+                            <AntDesign
+                                name={this.state.isFav?"star":"staro"}
+                                size={20}
+                            />
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>

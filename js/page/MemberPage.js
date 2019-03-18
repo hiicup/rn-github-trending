@@ -3,6 +3,7 @@ import {StyleSheet, View, Text, Button} from 'react-native';
 
 import actions from "../action"
 import {connect} from "react-redux"
+import FavDao from "../expend/dao/FavDao";
 
 
 type Props = {};
