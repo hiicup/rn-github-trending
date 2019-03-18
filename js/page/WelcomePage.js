@@ -13,13 +13,12 @@ export default class WelcomePage extends Component<Props> {
     componentDidMount() {
         this.timer = setTimeout(()=>{
             NavigationUtil.resetHomePage(this.props)
-        },3000)
+        },100)
     }
 
     componentWillUnmount() {
         this.timer && clearTimeout(this.timer);
     }
-
 
     render() {
         return (

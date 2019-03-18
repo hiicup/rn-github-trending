@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, Text} from 'react-native';
+import {StyleSheet, View, Text, BackHandler} from 'react-native';
 import {WebView} from "react-native-webview";
 
 import NavigationBar from "../common/NavigationBar"
@@ -25,6 +25,19 @@ export default class DetailPage extends Component<Props> {
         };
 
     }
+
+    componentDidMount() {
+        BackHandler.addEventListener("hardwareBackPress",this.onBackPress.bind(this));
+    }
+
+    componentWillUnmount() {
+        BackHandler.removeEventListener("hardwareBackPress",this.onBackPress.bind(this));
+    }
+
+    onBackPress(){
+        this.onBack();
+        return true;
+    };
 
     onBack() {
         console.log(this.state.canGoBack);
