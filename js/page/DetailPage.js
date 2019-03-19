@@ -14,7 +14,7 @@ export default class DetailPage extends Component<Props> {
     constructor(props) {
         super(props);
         this.params = this.props.navigation.state.params;
-        const {itemData,flag,favDao} = this.params;
+        const {itemData,favDao} = this.params;
 
         const item = itemData.item;
         this.itemData = itemData;

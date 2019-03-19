@@ -4,10 +4,45 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 
 
 export default class PopularItem extends Component {
-    render() {
-        const {item} = this.props;
 
-        return <TouchableOpacity onPress={()=>this.props.onSelect(item)}>
+    constructor(props){
+        super(props);
+        const {itemData} = this.props;
+
+        this.state = {
+            isFav:itemData.isFav
+        };
+    }
+
+    updateStateIsFav(isFav){
+        this.setState({
+            isFav:isFav
+        });
+        this.props.itemData.isFav = isFav;
+    }
+
+    /**
+     * 处理收藏点击事件
+     */
+    onFav(){
+        const {onFav,itemData} = this.props;
+        const isFav = !this.state.isFav;
+        this.updateStateIsFav(isFav);
+        onFav(itemData.item,isFav);
+    }
+
+    onClick(itemData){
+        const {onSelect} = this.props;
+        onSelect(itemData,(isFav)=>{
+            this.updateStateIsFav(isFav);
+        })
+    }
+
+    render() {
+        const {itemData} = this.props;
+        const item = itemData.item;
+
+        return <TouchableOpacity onPress={()=>this.onClick(itemData)}>
             <View style={styles.container}>
                 <Text style={{fontSize:16,color:'#212121',marginBottom:5}}>{item.full_name}</Text>
                 <Text style={{fontSize:14,color:'#757575',marginBottom:5}}>{item.description}</Text>
@@ -24,10 +59,12 @@ export default class PopularItem extends Component {
                         <Text>{item.stargazers_count}</Text>
                     </View>
                     <View>
-                        <AntDesign
-                            name={"staro"}
-                            size={20}
-                        />
+                        <TouchableOpacity onPress={this.onFav.bind(this)}>
+                            <AntDesign
+                                name={this.state.isFav?"star":"staro"}
+                                size={20}
+                            />
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>

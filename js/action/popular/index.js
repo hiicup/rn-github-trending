@@ -1,7 +1,8 @@
 import Types from "../types"
 import DataStore from "../../expend/dao/DataStore"
+import {wrap} from "../trending/index"
 
-export function onLoadPopularMoreData(storeName, pageIndex, pageSize, dataArray = [], callback) {
+export function onLoadPopularMoreData(storeName, pageIndex, pageSize, dataArray = [], callback,favDao) {
     return dispatch => {
         setTimeout(() => {
             if ((pageIndex - 1) * pageSize >= dataArray.length) {
@@ -19,12 +20,15 @@ export function onLoadPopularMoreData(storeName, pageIndex, pageSize, dataArray 
 
             }else{
                 let max = pageSize*pageIndex > dataArray.length ? dataArray.length:pageSize*pageIndex;
+                let showItems = dataArray.slice(0,max);
 
-                dispatch({
-                    type:Types.POPULAR_LOAD_MORE_SUCCESS,
-                    storeName:storeName,
-                    pageIndex: pageIndex,
-                    projectModes: dataArray.slice(0,max),
+                wrap(favDao,showItems,(projectModes)=>{
+                    dispatch({
+                        type:Types.POPULAR_LOAD_MORE_SUCCESS,
+                        storeName:storeName,
+                        pageIndex: pageIndex,
+                        projectModes: projectModes,
+                    })
                 })
 
             }
@@ -33,7 +37,7 @@ export function onLoadPopularMoreData(storeName, pageIndex, pageSize, dataArray 
 }
 
 
-export function onLoadPopularData(storeName, url, pageSize) {
+export function onLoadPopularData(storeName, url, pageSize,favDao) {
     return dispatch => {
         // 触发预加载
         dispatch({
@@ -45,7 +49,7 @@ export function onLoadPopularData(storeName, url, pageSize) {
         let store = new DataStore();
         store.fetchData(url)
             .then(jsonData => {
-                handleData(dispatch, storeName, jsonData, pageSize)
+                handleData(dispatch, storeName, jsonData, pageSize,favDao)
             })
             .catch(error => {
                 dispatch({
@@ -57,7 +61,9 @@ export function onLoadPopularData(storeName, url, pageSize) {
     }
 }
 
-function handleData(dispatch, storeName, jsonData, pageSize) {
+
+
+function handleData(dispatch, storeName, jsonData, pageSize,favDao) {
 
     let items = [];
 
@@ -65,11 +71,18 @@ function handleData(dispatch, storeName, jsonData, pageSize) {
         items = jsonData.data.items;
     }
 
-    dispatch({
-        type: Types.POPULAR_LOAD_SUCCESS,
-        items:items,
-        projectModes: pageSize > items.length?items:items.slice(0,pageSize),
-        pageIndex:1,
-        storeName,
-    })
+    let showItems = pageSize > items.length?items:items.slice(0,pageSize);
+
+    wrap(favDao,showItems,(projectModes)=>{
+        dispatch({
+            type: Types.POPULAR_LOAD_SUCCESS,
+            items:items,
+            projectModes: projectModes,
+            pageIndex:1,
+            storeName,
+        })
+    });
 }
+
+
+

@@ -88,7 +88,7 @@ class Item {
         this.isFav = isFav;
     }
 }
-async function wrap(favDao,items,callback){
+export async function wrap(favDao,items,callback){
     let favKeys = [];
     try{
         favKeys = await favDao.getAllFavKeys();

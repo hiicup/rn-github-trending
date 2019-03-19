@@ -17,13 +17,15 @@ import actions from "../action/index"
 import PopularItem from "../common/PopularItem"
 
 import NavigationBar from "../common/NavigationBar"
-import Store, {FLAG_TYPE} from "../expend/dao/DataStore";
+import {FLAG_TYPE} from "../expend/dao/DataStore";
 import NavigationUtil from "../navigator/NavigationUtil";
+import FavDao from "../expend/dao/FavDao";
 
 
 const URL = "https://api.github.com/search/repositories?q=";
 const QUERY_STRING = '&sort=stars';
 
+const favDao = new FavDao(FLAG_TYPE.POPULAR);
 
 type Props = {};
 export default class PopularPage extends Component<Props> {
@@ -106,13 +108,20 @@ class PopularTab extends Component {
         return URL + key + QUERY_STRING;
     }
 
-    renderItem(item) {
-        return <PopularItem item={item.item} onSelect={item => {
-            NavigationUtil.gotoPage({
-                navigation:NavigationUtil.navigation,
-                item
-            },"DetailPage")
-        }}/>
+    renderItem(data) {
+        return <PopularItem
+            itemData={data.item}
+            onFav={(item,isFav)=>{
+                FavDao.onFav(favDao,item,isFav);
+            }}
+            onSelect={(itemData,callback) => {
+                NavigationUtil.gotoPage({
+                    navigation:NavigationUtil.navigation,
+                    itemData,
+                    callback,
+                    favDao
+                },"DetailPage")
+            }}/>
     }
 
     getStore() {
@@ -149,7 +158,7 @@ class PopularTab extends Component {
             <FlatList
                 data={store.projectModes}
                 renderItem={item => this.renderItem(item)}
-                keyExtractor={item => "" + item.id}
+                keyExtractor={item => "" + item.item.id}
                 refreshControl={
                     <RefreshControl
                         title={"加载中..."}
@@ -183,10 +192,10 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
     onLoadPopularData: (storeName, url,pageSize) => {
-        dispatch(actions.onLoadPopularData(storeName, url,pageSize));
+        dispatch(actions.onLoadPopularData(storeName, url,pageSize,favDao));
     },
     onLoadPopularMoreData: (storeName, pageIndex, pageSize, items, callback) => {
-        dispatch(actions.onLoadPopularMoreData(storeName, pageIndex, pageSize, items, callback));
+        dispatch(actions.onLoadPopularMoreData(storeName, pageIndex, pageSize, items, callback,favDao));
     }
 });
 
