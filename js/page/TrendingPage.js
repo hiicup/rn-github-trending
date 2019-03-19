@@ -17,6 +17,8 @@ import TrendingDialog,{items as TrendingItems} from "../common/TrendingDialog"
 import NavigationUtil from "../navigator/NavigationUtil";
 import FavDao from "../expend/dao/FavDao";
 import {FLAG_TYPE} from "../expend/dao/DataStore";
+import EventBus from "react-native-event-bus";
+import Event from "../common/events";
 
 const URL = "https://github.com/trending/";
 
@@ -109,6 +111,7 @@ class TabPage extends Component {
         const {name,tabItem} = this.props;
         this.storeName = name;
         this.tabItem = tabItem;
+        this.isFavChanged = false;
     }
 
     componentDidMount() {
@@ -117,16 +120,30 @@ class TabPage extends Component {
             this.tabItem = item;
             this.loadData();
         });
+
+        EventBus.getInstance().addListener(Event.fav_trending_cancel,this.favCancelListener = ()=>{
+            this.isFavChanged = true;
+        });
+        EventBus.getInstance().addListener(Event.bottom_navbar_changed,this.tabChangedListener = (data)=>{
+            if(data.to === 2 && this.isFavChanged){
+                this.loadData(false)
+            }
+        })
+
     }
 
     componentWillUnmount() {
         if(this.sinceChangeEventListener){
             this.sinceChangeEventListener.remove();
         }
+
+        EventBus.getInstance().removeListener(this.favCancelListener);
+        EventBus.getInstance().removeListener(this.tabChangedListener);
     }
 
 
     loadData(isLoadMore) {
+        this.isFavChanged = false;
         const {onLoadTrendingData, onLoadTrendingMoreData} = this.props;
         let store = this.getStore();
         const url = this.buildFetchUrl(this.storeName);

@@ -14,6 +14,22 @@ export default class PopularItem extends Component {
         };
     }
 
+    /**
+     * 从属性来检测变化，更新到状态上
+     * @param nextProps
+     * @param prevState
+     * @returns {*}
+     */
+    static getDerivedStateFromProps(nextProps,prevState){
+        const isFav = nextProps.itemData.isFav;
+        if(isFav !== prevState.isFav){
+            return {
+                isFav:isFav
+            }
+        }
+        return null;
+    }
+
     updateStateIsFav(isFav){
         this.setState({
             isFav:isFav

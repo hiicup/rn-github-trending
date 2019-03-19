@@ -1,6 +1,7 @@
 import {onThemeChange} from "./theme"
 import {onLoadPopularData,onLoadPopularMoreData} from "./popular"
 import {onLoadTrendingData,onLoadTrendingMoreData} from "./trending"
+import {createActionLoadData} from "./fav"
 
 export default {
     onThemeChange,
@@ -9,5 +10,7 @@ export default {
     onLoadPopularMoreData,
 
     onLoadTrendingData,
-    onLoadTrendingMoreData
+    onLoadTrendingMoreData,
+
+    createActionLoadData
 }

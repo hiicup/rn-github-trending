@@ -39,7 +39,31 @@ export default class FavDao {
     }
 
     getAllFav(){
+        return new Promise((resolve, reject) => {
+            this.getAllFavKeys().then(keys=>{
+                let items = [];
 
+                if(keys){
+                    AsyncStorage.multiGet(keys,(err,allItems)=>{
+                        try{
+                            allItems.forEach((currentItem,index,arr)=>{
+                                const item = currentItem[1];
+                                if(item){
+                                    items.push(JSON.parse(item));
+                                }
+                            });
+                            resolve(items);
+                        }catch (e) {
+                            reject(e);
+                        }
+                    })
+                }else{
+                    resolve(items);
+                }
+            }).catch(e=>{
+                reject(e);
+            })
+        })
     }
 
     /**
@@ -56,6 +80,7 @@ export default class FavDao {
 
         for (let i = 0; i < keys.length; i++) {
             if(FavDao.parseKey(item) === keys[i]){
+                console.log("找到了",item);
                 isHas = true;
                 break;
             }
@@ -83,6 +108,7 @@ export default class FavDao {
         const id = FavDao.parseKey(item);
         console.log("id=",id);
         console.log("isFav=",isFav);
+        console.log("storeName=",favDao.storeKey);
         if(isFav){
             favDao.addFav(id,item);
         }else{

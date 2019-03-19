@@ -82,7 +82,7 @@ function handleData(dispatch, storeName, jsonData, pageSize,favDao) {
 
 }
 
-class Item {
+export class Item {
     constructor(item,isFav){
         this.item = item;
         this.isFav = isFav;
@@ -96,7 +96,7 @@ export async function wrap(favDao,items,callback){
         console.log(e);
     }
 
-    console.log("已收藏：",favKeys);
+    console.log("已收藏：",favDao.storeKey,favKeys);
 
     let newItems = [];
 

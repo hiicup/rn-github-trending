@@ -15,11 +15,13 @@ import {connect} from "react-redux"
 import actions from "../action/index"
 
 import PopularItem from "../common/PopularItem"
+import Event from "../common/events"
 
 import NavigationBar from "../common/NavigationBar"
 import {FLAG_TYPE} from "../expend/dao/DataStore";
 import NavigationUtil from "../navigator/NavigationUtil";
 import FavDao from "../expend/dao/FavDao";
+import EventBus from "react-native-event-bus";
 
 
 const URL = "https://api.github.com/search/repositories?q=";
@@ -84,14 +86,28 @@ class PopularTab extends Component {
         super(props);
         const {name} = this.props;
         this.storeName = name;
+        this.isFavChanged = false;
     }
 
     componentDidMount() {
         this.loadData();
+        EventBus.getInstance().addListener(Event.fav_popular_cancel,this.favCancelListener = ()=>{
+            this.isFavChanged = true;
+        });
+        EventBus.getInstance().addListener(Event.bottom_navbar_changed,this.tabChangedListener = (data)=>{
+            if(data.to === 1 && this.isFavChanged){
+                this.loadData(false)
+            }
+        })
     }
 
+    componentWillUnmount() {
+        EventBus.getInstance().removeListener(this.favCancelListener);
+        EventBus.getInstance().removeListener(this.tabChangedListener);
+    }
 
     loadData(isLoadMore) {
+        this.isFavChanged = false;
         const {onLoadPopularData, onLoadPopularMoreData} = this.props;
         let store = this.getStore();
         const url = PopularTab.buildFetchUrl(this.storeName);

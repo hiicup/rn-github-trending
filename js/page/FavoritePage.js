@@ -1,69 +1,191 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, Text, Button,Modal} from 'react-native';
+import {StyleSheet, View, Text, FlatList,RefreshControl,StatusBar} from 'react-native';
 import actions from "../action"
 import {connect} from "react-redux"
 
 import NavigationBar from "../common/NavigationBar"
-import TrendingDialog from "../common/TrendingDialog"
 
+import {createMaterialTopTabNavigator} from "react-navigation"
+import FavDao from "../expend/dao/FavDao";
+import {FLAG_TYPE} from "../expend/dao/DataStore";
+import PopularItem from "../common/PopularItem";
+import NavigationUtil from "../navigator/NavigationUtil";
+import TrendingItem from "../common/TrendingItem";
+import EventBus from "react-native-event-bus";
+import Event from "../common/events";
+
+const tabSet = [
+    {name:FLAG_TYPE.POPULAR,label:'最热'},
+    {name:FLAG_TYPE.TRENDING,label:'趋势'},
+];
 
 type Props = {};
-class FavoritePage extends Component<Props> {
+export default class FavoritePage extends Component<Props> {
 
-    constructor(props){
-        super(props);
-        this.state = {
-            visible:true
-        }
+    componentDidMount() {
+        // favDao.getAllFav()
+        //     .then(items=>{
+        //         console.log("数据",items);
+        //     })
+        //     .catch(e=>{
+        //         console.error(e);
+        //     })
     }
 
-    render() {
 
-        const titleView = <View>
-            <Text style={{
-                fontSize:16,
-                color:'white'
-            }}>收藏</Text>
-        </View>;
+    render() {
+        const tabs =[];
+        tabSet.forEach((item,index)=>{
+            tabs[`tab-${index}`] = {
+                screen:props=><TabPage {...props} name={item.name}/>,
+                navigationOptions:{
+                    title:item.label
+                }
+            }
+        });
+
+        const TabNavigator = createMaterialTopTabNavigator(tabs,{
+            tabBarOptions: {
+                upperCaseLabel: false, // 禁止自动大写
+                scrollEnabled: false, // 关闭横向滚动
+                style: {
+                    backgroundColor: '#678' // 设置整个tabBar的底色
+                },
+                tabStyle: styles.tabStyle,                  // 设置每一个tab样式，比如宽度
+                indicatorStyle: styles.indicatorStyle,    // 底部游标的样式
+                labelStyle: styles.labelStyle                // 文字样式
+            }
+        });
 
         return (
-            <View style={styles.container}>
+            <View style={{flex:1}}>
                 <NavigationBar
-                    titleView={titleView}
+                    title={"收藏"}
                 />
-                <TrendingDialog onClick={(item)=>{
-                    alert(item.text);
-                }} onClose={()=>{
-                    alert("onClose")
-                }}/>
-                <Text>FavoritePage</Text>
-
-                <Button title={"弹窗"} onPress={()=>{
-                    this.setState({
-                        visible:true
-                    })
-                }}/>
-
-                <Button title={"换色"} onPress={()=>{
-                    this.props.onThemeChange("red")
-                }}/>
+                <TabNavigator/>
             </View>
         );
     }
 }
 
+class TabScreen extends Component{
+    constructor(props){
+        super(props);
+        const {name} = this.props;
+        this.storeName = name;
+        this.favDao = new FavDao(name);
+    }
+
+    componentDidMount() {
+        this.loadData();
+        EventBus.getInstance().addListener(Event.bottom_navbar_changed,this.tabChangedListener = (data)=>{
+            if(data.to === 0){
+                this.loadData()
+            }
+        })
+    }
+
+    componentWillUnmount() {
+        EventBus.getInstance().removeListener(this.tabChangedListener);
+    }
+
+
+    getData(){
+        const {fav} = this.props;
+        let data = fav[this.storeName];
+        if(!data){
+            data = {
+                isLoading:false,
+                projectModes:[]
+            };
+        }
+        return data;
+    }
+
+    loadData(){
+        const {loadData} = this.props;
+        loadData(this.storeName);
+    }
+
+    getKey(item){
+        if(this.isPopular()){
+            return item.id || item.fullName;
+        }
+        return item.fullName;
+    }
+
+    isPopular(){
+        return this.storeName === FLAG_TYPE.POPULAR;
+    }
+
+    onFav(item,isFav){
+        // 触发事件，有收藏被取消了
+        const eventName = this.isPopular()?Event.fav_popular_cancel:Event.fav_trending_cancel;
+        EventBus.getInstance().fireEvent(eventName);
+        FavDao.onFav(this.favDao,item,isFav);
+    }
+
+    renderItem(data){
+
+        const Item = this.isPopular()?PopularItem:TrendingItem;
+
+        return <Item
+            itemData={data.item}
+            onFav={(item,isFav)=>this.onFav(item,isFav)}
+            onSelect={(itemData,callback) => {
+                NavigationUtil.gotoPage({
+                    navigation:NavigationUtil.navigation,
+                    itemData,
+                    callback,
+                    favDao
+                },"DetailPage")
+            }}/>
+    }
+
+    render(){
+        const store = this.getData();
+
+        return <View style={styles.container}>
+            <FlatList
+                data={store.projectModes}
+                renderItem={item => this.renderItem(item)}
+                keyExtractor={item => "" + this.getKey(item.item)}
+                refreshControl={
+                    <RefreshControl
+                        title={"加载中..."}
+                        refreshing={store.isLoading}
+                        onRefresh={() => this.loadData()}
+                    />
+                }
+            />
+        </View>
+    }
+}
+
+const mapStateToProps = state=>({
+    fav:state.fav
+});
+
+const mapDispatchToProps = dispatch=>({
+    loadData:storeName=>dispatch(actions.createActionLoadData(storeName))
+});
+
+
+const TabPage = connect(mapStateToProps,mapDispatchToProps)(TabScreen)
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5FCFF',
+        padding: 10,
+        backgroundColor: '#f5f5f5',
+    },
+    tabStyle: {
+        width: 120,
+    },
+    indicatorStyle: {
+        backgroundColor: 'white'
+    },
+    labelStyle: {
+        fontSize: 13
     }
 });
-
-const mapStateToProps = state=>({});
-
-const mapDispatchToProps = dispatch=>({
-    onThemeChange:theme=>dispatch(actions.onThemeChange(theme))
-});
-
-
-export default connect(mapStateToProps,mapDispatchToProps)(FavoritePage)

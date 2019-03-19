@@ -10,12 +10,15 @@ import TrendingPage from "./../page/TrendingPage";
 import FavoritePage from "./../page/FavoritePage";
 import MemberPage from "./../page/MemberPage";
 
+import Event from "../common/events";
+
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import Entypo from "react-native-vector-icons/Entypo";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
 import {BottomTabBar} from "react-navigation-tabs";
+import EventBus from "react-native-event-bus";
 
 const TABS = {
     PopularPage: {
@@ -81,7 +84,7 @@ class DynamicTabNavigator extends Component {
         }
 
         const {PopularPage,TrendingPage,FavoritePage,MemberPage} = TABS;
-        const tabs = {PopularPage,TrendingPage,FavoritePage,MemberPage};
+        const tabs = {FavoritePage,PopularPage,TrendingPage,MemberPage};
         return this.Tabs =  createBottomTabNavigator(tabs,{
             tabBarComponent:props=>{
                 return <TabBarComponent theme={this.props.theme} {...props} />
@@ -91,7 +94,14 @@ class DynamicTabNavigator extends Component {
 
     render() {
         const Tab = this._tabNavigator();
-        return <Tab/>
+        return <Tab
+            onNavigationStateChange={(prevState, newState, action) => {
+                EventBus.getInstance().fireEvent(Event.bottom_navbar_changed, {//发送底部tab切换的事件
+                    from: prevState.index,
+                    to: newState.index
+                })
+            }}
+        />
     }
 }
 
