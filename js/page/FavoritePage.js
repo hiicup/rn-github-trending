@@ -80,12 +80,13 @@ class TabScreen extends Component{
         this.loadData();
         EventBus.getInstance().addListener(Event.bottom_navbar_changed,this.tabChangedListener = (data)=>{
             if(data.to === 0){
-                this.loadData()
+                this.timer = setTimeout(()=>this.loadData(),200)
             }
         })
     }
 
     componentWillUnmount() {
+        this.timer&&clearTimeout(this.timer);
         EventBus.getInstance().removeListener(this.tabChangedListener);
     }
 
@@ -137,7 +138,7 @@ class TabScreen extends Component{
                     navigation:NavigationUtil.navigation,
                     itemData,
                     callback,
-                    favDao
+                    favDao:this.favDao
                 },"DetailPage")
             }}/>
     }
@@ -158,6 +159,7 @@ class TabScreen extends Component{
                     />
                 }
             />
+            <StatusBar backgroundColor={'#678'} />
         </View>
     }
 }

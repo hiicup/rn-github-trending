@@ -112,21 +112,30 @@ class TabPage extends Component {
         this.storeName = name;
         this.tabItem = tabItem;
         this.isFavChanged = false;
+        this.timerQueue = [];
+    }
+
+    delayLoadData(){
+        this.timerQueue.push(
+            setTimeout(()=>this.loadData(),100)
+        )
     }
 
     componentDidMount() {
         this.loadData();
         this.sinceChangeEventListener = DeviceEventEmitter.addListener(EVENT_SINCE_CHANGE,item=>{
             this.tabItem = item;
-            this.loadData();
+
+            this.delayLoadData();
         });
 
         EventBus.getInstance().addListener(Event.fav_trending_cancel,this.favCancelListener = ()=>{
             this.isFavChanged = true;
         });
+
         EventBus.getInstance().addListener(Event.bottom_navbar_changed,this.tabChangedListener = (data)=>{
             if(data.to === 2 && this.isFavChanged){
-                this.loadData(false)
+                this.delayLoadData();
             }
         })
 
@@ -136,6 +145,10 @@ class TabPage extends Component {
         if(this.sinceChangeEventListener){
             this.sinceChangeEventListener.remove();
         }
+
+        this.timerQueue.forEach((currentTimer,index,arr)=>{
+            clearTimeout(currentTimer);
+        });
 
         EventBus.getInstance().removeListener(this.favCancelListener);
         EventBus.getInstance().removeListener(this.tabChangedListener);

@@ -96,12 +96,13 @@ class PopularTab extends Component {
         });
         EventBus.getInstance().addListener(Event.bottom_navbar_changed,this.tabChangedListener = (data)=>{
             if(data.to === 1 && this.isFavChanged){
-                this.loadData(false)
+                this.timer = setTimeout(()=>this.loadData(false),100);
             }
         })
     }
 
     componentWillUnmount() {
+        this.timer && clearTimeout(this.timer);
         EventBus.getInstance().removeListener(this.favCancelListener);
         EventBus.getInstance().removeListener(this.tabChangedListener);
     }
