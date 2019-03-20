@@ -4,8 +4,9 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import AntDesign from "react-native-vector-icons/AntDesign";
 
 export default class ViewHelper {
+
     static leftBackBtnView(callback){
-        return <TouchableOpacity style={{paddingLeft:12}} onPress={callback}>
+        return <TouchableOpacity style={{paddingLeft:12,paddingRight:50}} onPress={callback}>
             <Ionicons
                 name={'ios-arrow-back'}
                 size={26}

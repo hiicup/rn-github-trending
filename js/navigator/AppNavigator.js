@@ -11,6 +11,7 @@ import {connect} from "react-redux";
 import {
     createReactNavigationReduxMiddleware, createReduxContainer
 } from "react-navigation-redux-helpers";
+import WebPage from "../page/WebPage";
 
 const InitNavigator = createStackNavigator({
     WelcomePage:{
@@ -33,7 +34,13 @@ const MainNavigator = createStackNavigator({
         navigationOptions:{
             header:null
         }
-    }
+    },
+    WebPage:{
+        screen:WebPage,
+        navigationOptions:{
+            header:null
+        }
+    },
 });
 
 export const rootCom = 'Init';

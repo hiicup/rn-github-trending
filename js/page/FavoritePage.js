@@ -63,6 +63,7 @@ export default class FavoritePage extends Component<Props> {
                     title={"收藏"}
                 />
                 <TabNavigator/>
+                <StatusBar backgroundColor={'#678'} />
             </View>
         );
     }
@@ -159,7 +160,6 @@ class TabScreen extends Component{
                     />
                 }
             />
-            <StatusBar backgroundColor={'#678'} />
         </View>
     }
 }
