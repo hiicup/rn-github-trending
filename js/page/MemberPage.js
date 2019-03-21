@@ -11,16 +11,22 @@ import {MENU} from "../common/menu"
 import Item from "../component/Member/Item"
 import Line from "../component/Line"
 import {RightArrow} from "../component/Icon"
-import BaseStyles from "../res/Styles"
-import ViewHelper from "../common/ViewHelper";
 import NavigationUtil from "../navigator/NavigationUtil";
 
-
+import Hiicup from "../common/Hiicup";
 
 const WEB_ROUTE_NAME = 'WebPage';
 type Props = {};
 class MemberPage extends Component<Props> {
 
+    componentDidMount() {
+        this.getApi();
+    }
+
+    async getApi(){
+        const api = await Hiicup.api();
+        Hiicup.sayHello(api);
+    }
 
     onClick(menu){
         let routeName,params = {
