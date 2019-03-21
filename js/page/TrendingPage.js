@@ -19,6 +19,8 @@ import FavDao from "../expend/dao/FavDao";
 import {FLAG_TYPE} from "../expend/dao/DataStore";
 import EventBus from "react-native-event-bus";
 import Event from "../common/events";
+import Conf from "../common/Conf";
+
 
 const URL = "https://github.com/trending/";
 
@@ -134,7 +136,7 @@ class TabPage extends Component {
         });
 
         EventBus.getInstance().addListener(Event.bottom_navbar_changed,this.tabChangedListener = (data)=>{
-            if(data.to === 2 && this.isFavChanged){
+            if(data.to === Conf.NAV_INDEX.TRENDING && this.isFavChanged){
                 this.delayLoadData();
             }
         })

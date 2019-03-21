@@ -13,6 +13,7 @@ import NavigationUtil from "../navigator/NavigationUtil";
 import TrendingItem from "../common/TrendingItem";
 import EventBus from "react-native-event-bus";
 import Event from "../common/events";
+import Conf from "../common/Conf";
 
 const tabSet = [
     {name:FLAG_TYPE.POPULAR,label:'最热'},
@@ -47,7 +48,6 @@ export default class FavoritePage extends Component<Props> {
         const TabNavigator = createMaterialTopTabNavigator(tabs,{
             tabBarOptions: {
                 upperCaseLabel: false, // 禁止自动大写
-                scrollEnabled: false, // 关闭横向滚动
                 style: {
                     backgroundColor: '#678' // 设置整个tabBar的底色
                 },
@@ -80,7 +80,7 @@ class TabScreen extends Component{
     componentDidMount() {
         this.loadData();
         EventBus.getInstance().addListener(Event.bottom_navbar_changed,this.tabChangedListener = (data)=>{
-            if(data.to === 0){
+            if(data.to === Conf.NAV_INDEX.FAV){
                 this.timer = setTimeout(()=>this.loadData(),200)
             }
         })
@@ -182,7 +182,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5',
     },
     tabStyle: {
-        width: 120,
     },
     indicatorStyle: {
         backgroundColor: 'white'

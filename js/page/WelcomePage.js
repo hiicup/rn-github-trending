@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {StyleSheet, View,Text} from 'react-native';
 import NavigationUtil from "../navigator/NavigationUtil";
+import Conf from "../common/Conf"
 
 
 type Props = {};
@@ -8,22 +9,41 @@ export default class WelcomePage extends Component<Props> {
 
     constructor(props){
         super(props);
+        this.state = {
+            time:Conf.WELCOME_TIME_SECONDS
+        };
     }
 
     componentDidMount() {
-        this.timer = setTimeout(()=>{
+
+        if(Conf.ENV_DEV){
             NavigationUtil.resetHomePage(this.props)
-        },30)
+        }else{
+            this.timer = setInterval(()=>{
+
+                if(this.state.time > 1){
+                    this.setState({
+                        time:this.state.time-1
+                    });
+                }else{
+                    NavigationUtil.resetHomePage(this.props)
+                }
+            },1000);
+        }
     }
 
     componentWillUnmount() {
-        this.timer && clearTimeout(this.timer);
+        this.timer && clearInterval(this.timer);
     }
 
     render() {
         return (
             <View style={styles.container}>
-                <Text style={{fontSize:20}}>RN学习练手项目</Text>
+                <Text style={{fontSize:20}}>
+                    ReactNative学习项目
+                    <Text style={{fontSize:18}}>({this.state.time})</Text>
+                </Text>
+
             </View>
         );
     }

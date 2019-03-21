@@ -23,7 +23,9 @@ class MemberPage extends Component<Props> {
 
 
     onClick(menu){
-        let routeName,params = {};
+        let routeName,params = {
+            navigation:NavigationUtil.navigation
+        };
         switch (menu) {
             case MENU.Tutorial:
             routeName = WEB_ROUTE_NAME;

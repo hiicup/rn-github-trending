@@ -16,6 +16,8 @@ import actions from "../action/index"
 
 import PopularItem from "../common/PopularItem"
 import Event from "../common/events"
+import Conf from "../common/Conf";
+
 
 import NavigationBar from "../common/NavigationBar"
 import {FLAG_TYPE} from "../expend/dao/DataStore";
@@ -34,8 +36,8 @@ export default class PopularPage extends Component<Props> {
 
     constructor(props) {
         super(props);
-        // this.tabNames = ['Java', 'Python', 'Golang',"Javascript","Rust","Ruby"]
-        this.tabNames = ['Java']
+        this.tabNames = ['Java', 'Python', 'PHP',"Javascript","Rust","Ruby"]
+        // this.tabNames = ['Java']
     }
 
     _genTabs() {
@@ -95,7 +97,7 @@ class PopularTab extends Component {
             this.isFavChanged = true;
         });
         EventBus.getInstance().addListener(Event.bottom_navbar_changed,this.tabChangedListener = (data)=>{
-            if(data.to === 1 && this.isFavChanged){
+            if(data.to === Conf.NAV_INDEX.POPULAR && this.isFavChanged){
                 this.timer = setTimeout(()=>this.loadData(false),100);
             }
         })

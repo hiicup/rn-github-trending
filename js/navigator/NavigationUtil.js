@@ -7,11 +7,17 @@ export default class NavigationUtil {
 
     static goback(params){
         const navigation = NavigationUtil.getNavigation(params);
+        console.log("navigation",navigation);
         navigation.goBack();
     }
 
     static getNavigation(params){
-        return params.navigation || NavigationUtil.navigation;
+
+        if(params !== undefined && params.navigation){
+            return params.navigation;
+        }
+
+        return NavigationUtil.navigation;
     }
 
     static gotoPage(params,pageName){
