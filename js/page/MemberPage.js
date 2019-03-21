@@ -19,10 +19,6 @@ const WEB_ROUTE_NAME = 'WebPage';
 type Props = {};
 class MemberPage extends Component<Props> {
 
-    componentDidMount() {
-        this.getApi();
-    }
-
     async getApi(){
         const api = await Hiicup.api();
         Hiicup.sayHello(api);
