@@ -7,5 +7,5 @@ export default {
     },
     // 欢迎页面欢迎时间
     WELCOME_TIME_SECONDS:3,
-    ENV_DEV:true
+    ENV_DEV:false
 }
