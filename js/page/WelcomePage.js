@@ -3,6 +3,8 @@ import {StyleSheet, View,Text} from 'react-native';
 import NavigationUtil from "../navigator/NavigationUtil";
 import Conf from "../common/Conf"
 
+import SplashScreen from "react-native-splash-screen"
+
 
 type Props = {};
 export default class WelcomePage extends Component<Props> {
@@ -15,7 +17,8 @@ export default class WelcomePage extends Component<Props> {
     }
 
     componentDidMount() {
-
+        // 关闭启动屏
+        SplashScreen.hide();
         if(Conf.ENV_DEV){
             NavigationUtil.resetHomePage(this.props)
         }else{

@@ -19,7 +19,6 @@ class HomePage extends Component<Props> {
         BackHandler.removeEventListener("hardwareBackPress",this.onBackPress);
     }
 
-
     onBackPress = ()=>{
         const {dispatch,nav} = this.props;
         if(nav.routes[1].index === 0){

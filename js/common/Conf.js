@@ -1,9 +1,9 @@
 export default {
     NAV_INDEX:{
-        MEMBER:3,
-        FAV:2,
         POPULAR:0,
-        TRENDING:1
+        TRENDING:1,
+        FAV:2,
+        MEMBER:3
     },
     // 欢迎页面欢迎时间
     WELCOME_TIME_SECONDS:3,

@@ -84,7 +84,8 @@ export default class TrendingPage extends Component<Props> {
                     tabStyle: styles.tabStyle,                  // 设置每一个tab样式，比如宽度
                     indicatorStyle: styles.indicatorStyle,    // 底部游标的样式
                     labelStyle: styles.labelStyle                // 文字样式
-                }
+                },
+                lazy: true,
             });
         }
         return this.tabNav;
