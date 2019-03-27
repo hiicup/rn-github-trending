@@ -18,12 +18,16 @@ import PopularItem from "../common/PopularItem"
 import Event from "../common/events"
 import Conf from "../common/Conf";
 
+import defaultKeys from "../res/keys"
+
 
 import NavigationBar from "../common/NavigationBar"
 import {FLAG_TYPE} from "../expend/dao/DataStore";
 import NavigationUtil from "../navigator/NavigationUtil";
 import FavDao from "../expend/dao/FavDao";
 import EventBus from "react-native-event-bus";
+
+import {TARGET as LANG} from "../expend/dao/LanguageDao"
 
 
 const URL = "https://api.github.com/search/repositories?q=";
@@ -32,54 +36,77 @@ const QUERY_STRING = '&sort=stars';
 const favDao = new FavDao(FLAG_TYPE.POPULAR);
 
 type Props = {};
-export default class PopularPage extends Component<Props> {
+class PopularPage extends Component<Props> {
 
     constructor(props) {
         super(props);
         this.tabNames = ['Java', 'Python', 'PHP',"Javascript","Rust","Ruby"]
-        // this.tabNames = ['Java']
+        const {loadKeys} = this.props;
+        loadKeys(LANG.key);
     }
 
     _genTabs() {
         const tabs = {};
+        const {keys} = this.props;
 
-        this.tabNames.forEach((item, index) => {
-            tabs[`Tab${index}`] = {
-                screen: (props) => <PopularTabPage {...props} name={item}/>,
-                navigationOptions: {
-                    title: item
-                }
-            };
+        console.log("keys ======= ",keys,defaultKeys);
+
+        keys.forEach((item, index) => {
+
+            if(item.checked){
+                tabs[`Tab${index}`] = {
+                    screen: (props) => <PopularTabPage {...props} name={item.alias}/>,
+                    navigationOptions: {
+                        title: item.alias
+                    }
+                };
+            }
+
         });
 
         return tabs;
     }
 
     render() {
-        const TabNavigator = createMaterialTopTabNavigator(this._genTabs(), {
-            tabBarOptions: {
-                upperCaseLabel: false, // 禁止自动大写
-                scrollEnabled: true, // 启用横向滚动
-                style: {
-                    backgroundColor: '#678' // 设置整个tabBar的底色
+        let TabNavigator = null;
+        if(this.props.keys.length){
+            TabNavigator = createMaterialTopTabNavigator(this._genTabs(), {
+                tabBarOptions: {
+                    upperCaseLabel: false, // 禁止自动大写
+                    scrollEnabled: true, // 启用横向滚动
+                    style: {
+                        backgroundColor: '#678' // 设置整个tabBar的底色
+                    },
+                    tabStyle: styles.tabStyle,                  // 设置每一个tab样式，比如宽度
+                    indicatorStyle: styles.indicatorStyle,    // 底部游标的样式
+                    labelStyle: styles.labelStyle                // 文字样式
                 },
-                tabStyle: styles.tabStyle,                  // 设置每一个tab样式，比如宽度
-                indicatorStyle: styles.indicatorStyle,    // 底部游标的样式
-                labelStyle: styles.labelStyle                // 文字样式
-            },
-            lazy: true
-        });
+                lazy: true
+            });
+        }
 
         return (
             <View style={{flex:1}}>
                 <NavigationBar
                     title="最热"
                 />
-                <TabNavigator/>
+                {TabNavigator && <TabNavigator/>}
             </View>
         );
     }
 }
+
+const mapPopularStateToProps = state=>({
+    keys:state.language.keys
+});
+
+const mapPopularDispatchToProps = dispatch=>({
+    loadKeys:(flag)=>{
+        dispatch(actions.createActionLoadLanguage(flag))
+    }
+});
+
+export default connect(mapPopularStateToProps,mapPopularDispatchToProps)(PopularPage);
 
 const PAGE_SIZE = 8;
 

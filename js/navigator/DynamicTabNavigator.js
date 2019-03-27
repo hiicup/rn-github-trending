@@ -37,7 +37,7 @@ const TABS = {
     TrendingPage: {
         screen: TrendingPage,
         navigationOptions:{
-            title:"xxx",
+            title:"趋势",
             tabBarLabel:"趋势",
             tabBarIcon:({tintColor,focused})=>{
                 return <Ionicons
