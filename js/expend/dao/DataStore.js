@@ -1,6 +1,7 @@
 import {AsyncStorage} from "react-native"
 
 import TrendingFetch from "GitHubTrending"
+import Conf from "../../common/Conf";
 
 export const FLAG_TYPE = {
     POPULAR: 'POPULAR',
@@ -132,7 +133,7 @@ export default class DataStore {
         if (nowDate.getMonth() !== targetDate.getMonth()) return false;
         if (nowDate.getDate() !== targetDate.getDate()) return false;
 
-        return nowDate.getHours() - targetDate.getHours() < 4;
+        return nowDate.getHours() - targetDate.getHours() < Conf.DATA_EXPIRED_DURATION;
         // return nowDate.getMinutes() - targetDate.getMinutes() < 1
     }
 

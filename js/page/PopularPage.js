@@ -28,6 +28,7 @@ import FavDao from "../expend/dao/FavDao";
 import EventBus from "react-native-event-bus";
 
 import {TARGET as LANG} from "../expend/dao/LanguageDao"
+import Helper from "../common/Helper";
 
 
 const URL = "https://api.github.com/search/repositories?q=";
@@ -43,13 +44,13 @@ class PopularPage extends Component<Props> {
         this.tabNames = ['Java', 'Python', 'PHP',"Javascript","Rust","Ruby"]
         const {loadKeys} = this.props;
         loadKeys(LANG.key);
+        this.keysOld = [];
     }
 
     _genTabs() {
         const tabs = {};
         const {keys} = this.props;
-
-        console.log("keys ======= ",keys,defaultKeys);
+        this.keysOld = keys;
 
         keys.forEach((item, index) => {
 
@@ -73,7 +74,7 @@ class PopularPage extends Component<Props> {
             TabNavigator = createMaterialTopTabNavigator(this._genTabs(), {
                 tabBarOptions: {
                     upperCaseLabel: false, // 禁止自动大写
-                    scrollEnabled: true, // 启用横向滚动
+                    scrollEnabled: true, // 启用横向滚动*
                     style: {
                         backgroundColor: '#678' // 设置整个tabBar的底色
                     },

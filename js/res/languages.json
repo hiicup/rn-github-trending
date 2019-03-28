@@ -1,6 +1,7 @@
 [
   {"path": "","name": "All Language","alias": "All","checked": true},
-  {"path": "","name": "Javascript","alias": "Js","checked": true},
   {"path": "","name": "Python","alias": "Python","checked": true},
+  {"path": "","name": "Javascript","alias": "Js","checked": true},
+  {"path": "","name": "Java","alias": "Java","checked": true},
   {"path": "","name": "Rust","alias": "Rust","checked": true}
 ]

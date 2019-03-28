@@ -20,6 +20,8 @@ import {FLAG_TYPE} from "../expend/dao/DataStore";
 import EventBus from "react-native-event-bus";
 import Event from "../common/events";
 import Conf from "../common/Conf";
+import {TARGET as LANG} from "../expend/dao/LanguageDao"
+import Helper from "../common/Helper";
 
 
 const URL = "https://github.com/trending/";
@@ -31,26 +33,32 @@ const EVENT_SINCE_CHANGE = 'EVENT_SINCE_CHANGE';
 const favDao = new FavDao(FLAG_TYPE.TRENDING);
 
 type Props = {};
-export default class TrendingPage extends Component<Props> {
+class TrendingPage extends Component<Props> {
 
     constructor(props) {
         super(props);
-        this.tabNames = [ALL_Text,"Java",'Python'];
         this.state = {
             tabItem:TrendingItems[0]
         };
+        const {loadKeys} = this.props;
+        loadKeys(LANG.lang);
+        this.keysOld = [];
     }
 
     _genTabs() {
         const tabs = {};
+        const {keys} = this.props;
+        this.keysOld = keys;
 
-        this.tabNames.forEach((item, index) => {
-            tabs[`Tab${index}`] = {
-                screen: (props) => <TrendingTabPage {...props} tabItem={this.state.tabItem} name={item}/>,
-                navigationOptions: {
-                    title: item
-                }
-            };
+        keys.forEach((item, index) => {
+            if(item.checked){
+                tabs[`Tab${index}`] = {
+                    screen: (props) => <TrendingTabPage {...props} tabItem={this.state.tabItem} name={item.alias}/>,
+                    navigationOptions: {
+                        title: item.alias
+                    }
+                };
+            }
         });
 
         return tabs;
@@ -73,7 +81,7 @@ export default class TrendingPage extends Component<Props> {
     }
 
     genNav(){
-        if(!this.tabNav){
+        if(!this.tabNav || !Helper.isArrayEqual(this.keysOld,this.props.keys)){
             this.tabNav = createMaterialTopTabNavigator(this._genTabs(), {
                 tabBarOptions: {
                     upperCaseLabel: false, // 禁止自动大写
@@ -92,18 +100,31 @@ export default class TrendingPage extends Component<Props> {
     }
 
     render() {
-        const TabNav = this.genNav();
+        const {keys} = this.props;
+        const TabNav = keys.length?this.genNav():null;
         return (
             <View style={{flex:1}}>
                 <NavigationBar
                     titleView={this.renderTitleView()}
                 />
-                <TabNav/>
+                {TabNav && <TabNav/>}
                 <TrendingDialog ref={dialog=>{this.dialog = dialog}} onClick={item=>this.onClickSince(item)} onClose={()=>{}}/>
             </View>
         );
     }
 }
+
+const mapTrendingStateToProps = state=>({
+    keys:state.language.languages
+});
+
+const mapTrendingDispatchToProps = dispatch=>({
+    loadKeys:flag=>{
+        dispatch(actions.createActionLoadLanguage(flag))
+    }
+});
+
+export default connect(mapTrendingStateToProps,mapTrendingDispatchToProps)(TrendingPage);
 
 const PAGE_SIZE = 8;
 
